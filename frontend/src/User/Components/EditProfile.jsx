@@ -1,12 +1,92 @@
 import React, { useState } from 'react'
+import { useEffect } from 'react'
 import { FaEdit } from 'react-icons/fa'
+import { toast } from 'react-toastify'
+import { updateUserProileAPI } from '../../services/allAPI.JS'
 
 function EditProfile() {
+    const [userId,setUserId] = useState("")
     const [offCanvas, setOffCanvas] = useState(false)
+    const [passwordMatch,setPasswordMatch] = useState(true)
+    const [preview,setPreview] = useState("")
+    const [userData, setUserData] = useState({
+        username: "",
+        // email: "",
+        password: "",
+        cPassword: '',
+        profileImage: '',
+        bio: '',
+        email: ''
+    })
+    console.log(userData);
+    
+
+    const inputEnter = (e, value) => {
+        if (value == "cPassword") {
+            setUserData({
+                ...userData,
+                [value]:e.target.value
+            })
+            userData.password == e.target.value ? setPasswordMatch(true) : setPasswordMatch(false)
+
+        } else if(value == "profileImage"){
+            console.log(e.target.files[0]);
+            const imageFile = e.target.files[0]
+            if(imageFile.type.startsWith("image/")){
+                setUserData({
+                    ...userData,
+                    profileImage: imageFile
+                })
+                const imageURL = URL.createObjectURL(imageFile)
+                setPreview(imageURL)
+            }
+        }else  {
+            setUserData({
+                ...userData,
+                [value]: e.target.value
+            })
+        }
+    }
+
+    const handleUpdate = async () => {
+        const { username, password ,cPassword ,bio ,profileImage } = userData
+        if(!username || !password || !cPassword || !bio){
+         toast.info("Please fill the form completely")
+        }else if(passwordMatch){
+            // toast.success("Ready for API")
+            const reqBody = new FormData()
+            for(let key in userData){
+                if(key != profileImage){
+                    reqBody.append(key, userData[key])
+                }else{
+                    reqBody.append("profileImage",profileImage)
+                }
+            }
+            const result = await updateUserProileAPI(userId,reqBody)
+            console.log(result);
+            if(result.status == 200){
+                toast.success("Proile updated successully")
+                sessionStorage.setItem("user",JSON.stringify(result.data))
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (sessionStorage.getItem("user")) {
+            const data = JSON.parse(sessionStorage.getItem("user"))
+            console.log(data);
+            setUserData({
+                ...userData,
+                username: data.username,
+                bio: data.bio
+            })
+            setUserId(data._id)
+        }
+    },[])
     return (
         <>
             <div>
-                <button onClick={()=>setOffCanvas(true)} className='flex items-center gap-2 text-xl border p-2 rounded-xl hover:bg-black hover:text-white duration-500 cursor-pointer'>
+                <button onClick={() => setOffCanvas(true)} className='flex items-center gap-2 text-xl border p-2 rounded-xl hover:bg-black hover:text-white duration-500 cursor-pointer'>
                     Edit
                     <FaEdit />
                 </button>
@@ -21,33 +101,36 @@ function EditProfile() {
                         {/* body */}
                         <div className="flex justify-center items-center flex-col my-5">
                             <label htmlFor='uploadProfileImage' className='relative'>
-                                <input type="file" className='hidden' id='uploadProfileImage' />
-                                <img src="https://res.cloudinary.com/dwaaoyztz/image/upload/v1783783482/user_s1wtzw.png" className='w-25 h-25' alt="" />
+                                <input onChange={(e)=>inputEnter(e,"profileImage")} type="file" className='hidden' id='uploadProfileImage' />
+                                <img src={ preview ? preview : "https://res.cloudinary.com/dwaaoyztz/image/upload/v1783783482/user_s1wtzw.png"} className='w-25 h-25 object-cover rounded-full' alt="" />
                                 <div className='bg-black text-white px-3 py-2 rounded absolute right-0 top-20'><FaEdit className='' /></div>
                             </label>
                         </div>
 
                         <div className="mt-2 mb-3 w-full px-5">
-                            <input type="text" placeholder='UserName' className='w-full border border-gray-300 rounded p-2' />
+                            <input onChange={(e) => inputEnter(e, "username")} value={userData.username} type="text" placeholder='UserName' className='w-full border border-gray-300 rounded p-2' />
                         </div>
 
                         <div className="mt-2 mb-3 w-full px-5">
-                            <input type="text" placeholder='UserName' className='w-full border border-gray-300 rounded p-2' />
+                            <input onChange={(e) => inputEnter(e, "password")} type="password" placeholder='password' className='w-full border border-gray-300 rounded p-2' />
                         </div>
 
                         <div className="mt-2 mb-3 w-full px-5">
-                            <input type="text" placeholder='UserName' className='w-full border border-gray-300 rounded p-2' />
+                            <input onChange={(e) => inputEnter(e, "cPassword")} type="password" placeholder='confirm password' className='w-full border border-gray-300 rounded p-2' />
+                            {
+                                !passwordMatch && <p className='text-red-600'>Passwords do not match</p>
+                            }
                         </div>
 
                         <div className="mt-2 mb-3 w-full px-5">
-                            <input type="text" placeholder='UserName' className='w-full border border-gray-300 rounded p-2' />
+                            <input onChange={(e) => inputEnter(e, "bio")} value={userData.bio} type="text" placeholder='Enter BIo' className='w-full border border-gray-300 rounded p-2' />
                         </div>
 
                         <div className='flex justify-end w-full px-5 mt-5 gap-5'>
                             <button className="bg-yellow-600 text-white py-2 px-3">Reset</button>
-                            <button className="bg-green-600 text-white py-2 px-3">Update</button>
+                            <button onClick={handleUpdate} className="bg-green-600 text-white py-2 px-3">Update</button>
                         </div>
-                        
+
                     </div>
                 </div>
 

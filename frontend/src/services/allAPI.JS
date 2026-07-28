@@ -10,3 +10,8 @@ export const registerAPI = async (reqBody) => {
 export const loginAPI = async (reqBody) => {
     return await commonAPI("POST",'/login',reqBody)
 }
+
+//update user
+export const updateUserProileAPI = async (userID, reqBody) => {
+    return await commonAPI("PUT",`/updateUser/${userID}`,reqBody)
+}

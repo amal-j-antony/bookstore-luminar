@@ -6,8 +6,25 @@ const axiosInstance = axios.create({
     timeout: 5000
 })
 
+axiosInstance.interceptors.request.use(
+    (config) => {
+        const token = sessionStorage.getItem("token")
+        if(token){
+             config.headers.Authorization = `bearer ${token}`
+        }
+        return config
+    },
+    (error) => {
+        return Promise.reject({
+            type: "configError",
+            data: error
+        })
+    }
+)
+
 axiosInstance.interceptors.response.use(
     (response) => {
+        
         console.log('Response received!');
         return response
     },
