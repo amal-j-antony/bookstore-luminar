@@ -3,12 +3,15 @@ import { useEffect } from 'react'
 import { FaEdit } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import { updateUserProileAPI } from '../../services/allAPI.JS'
-
+import {useNavigate } from 'react-router-dom'
+import axiosInstance from '../../services/axiosInstance'
 function EditProfile() {
+    const navigate = useNavigate()
     const [userId,setUserId] = useState("")
     const [offCanvas, setOffCanvas] = useState(false)
     const [passwordMatch,setPasswordMatch] = useState(true)
     const [preview,setPreview] = useState("")
+    const [existingUserImage,setExistingUserImage] = useState('')
     const [userData, setUserData] = useState({
         username: "",
         // email: "",
@@ -67,6 +70,11 @@ function EditProfile() {
             if(result.status == 200){
                 toast.success("Proile updated successully")
                 sessionStorage.setItem("user",JSON.stringify(result.data))
+                setTimeout(()=>{
+                    sessionStorage.clear()
+                    navigate("/login")
+                },2500)
+                
             }
         }
     }
@@ -77,8 +85,9 @@ function EditProfile() {
             console.log(data);
             setUserData({
                 ...userData,
-                username: data.username,
-                bio: data.bio
+                username: data?.username,
+                bio: data?.bio,
+                profileImage: data?.profileImage
             })
             setUserId(data._id)
         }
@@ -102,7 +111,12 @@ function EditProfile() {
                         <div className="flex justify-center items-center flex-col my-5">
                             <label htmlFor='uploadProfileImage' className='relative'>
                                 <input onChange={(e)=>inputEnter(e,"profileImage")} type="file" className='hidden' id='uploadProfileImage' />
-                                <img src={ preview ? preview : "https://res.cloudinary.com/dwaaoyztz/image/upload/v1783783482/user_s1wtzw.png"} className='w-25 h-25 object-cover rounded-full' alt="" />
+                                {
+                                    userData.profileImage ?
+                                    <img src={ preview ? preview : `${axiosInstance.defaults.baseURL}/uploads/${userData.profileImage}`} className='w-25 h-25 object-cover rounded-full' alt="" />
+                                    :
+                                    <img src={ preview ? preview : "https://res.cloudinary.com/dwaaoyztz/image/upload/v1783783482/user_s1wtzw.png"} className='w-25 h-25 object-cover rounded-full' alt="" />
+                                }
                                 <div className='bg-black text-white px-3 py-2 rounded absolute right-0 top-20'><FaEdit className='' /></div>
                             </label>
                         </div>

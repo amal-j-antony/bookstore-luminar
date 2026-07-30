@@ -11,7 +11,7 @@ const jwtAuthMiddleware = (req, res, next) => {
             const jwtResponse = jwt.verify(token, process.env.JWTkey)
             console.log(jwtResponse);
             if (jwtResponse) {
-                req.email = jwtResponse.email
+                req.email = jwtResponse.usermail
                 req.role = jwtResponse.role
                 next()
             }

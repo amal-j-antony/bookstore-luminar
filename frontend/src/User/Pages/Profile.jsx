@@ -6,48 +6,73 @@ import UploadBooks from '../Components/UploadBooks';
 import BookStatus from '../Components/BookStatus';
 import PurchaseHistory from '../Components/PurchaseHistory';
 import EditProfile from '../Components/EditProfile';
+import axiosInstance from '../../services/axiosInstance';
+import { useEffect } from 'react';
 
 function Profile() {
-  const [tab,setTab] = useState("upload")
+  const [tab, setTab] = useState("upload")
+  const [userData, setUserData] = useState({
+
+  })
+  
+
+  useEffect(() => {
+    if (sessionStorage.getItem("user")) {
+      const data = JSON.parse(sessionStorage.getItem("user"))
+      console.log(data);
+      setUserData({
+        ...userData,
+        username: data?.username,
+        bio: data?.bio,
+        profileImage: data?.profileImage,
+        userID: data._id
+      })
+      
+    }
+  }, [])
+
   return (
     <>
-      <Header/>
+      <Header />
       <div className="h-50 bg-black">
       </div>
-      <img src="https://res.cloudinary.com/dwaaoyztz/image/upload/v1782669460/samples/animals/cat.jpg" className='-my-25 h-50 w-50 object-cover ms-32 border-10 border-white rounded-full' alt="" />
+      <img src={
+        userData.profileImage? `${axiosInstance.defaults.baseURL}/uploads/${userData.profileImage}` 
+        : "https://res.cloudinary.com/dwaaoyztz/image/upload/v1782669460/samples/animals/cat.jpg"
+      } className='-my-25 h-50 w-50 object-cover ms-32 border-10 border-white rounded-full' alt="" />
       <div className="w-full flex justify-center items-center mt-30">
         <div className='container flex flex-col'>
           <div className='flex justify-between items-center'>
             <h1 className='text-xl flex items-center gap-2'>User name <MdVerified /> </h1>
-            <EditProfile/>
+            <EditProfile />
           </div>
           <div className="pt-5 font-bold">Bookstore User</div>
           <p className='py-5 text-justify'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi quibusdam alias cupiditate sapiente laboriosam libero et corporis vitae hic quasi reiciendis quia error fugiat corrupti, assumenda asperiores blanditiis aperiam tenetur. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis quasi, eligendi incidunt rerum eaque, in esse molestias voluptatibus vel asperiores commodi deserunt odit cumque doloribus quam! Adipisci odit, nesciunt nihil sit repellendus laboriosam vero et, delectus itaque pariatur laudantium consequatur.</p>
 
           <div className="flex justify-center">
-            <button onClick={()=> setTab("upload")} className={ tab == "upload" ? ' border-l border-t border-r p-5 cursor-pointer' : 'border-b p-5 cursor-pointer'}>Upload Book</button>
-            <button onClick={()=> setTab("status")} className={ tab == "status" ? 'border-l border-t border-r  p-5 cursor-pointer' : 'border-b p-5 cursor-pointer'}>Upload Books Status</button>
-            <button onClick={()=> setTab("history")} className={ tab == "history" ? 'border-l border-t border-r  p-5 cursor-pointer' : 'border-b p-5 cursor-pointer'}>Purchase History</button>
+            <button onClick={() => setTab("upload")} className={tab == "upload" ? ' border-l border-t border-r p-5 cursor-pointer' : 'border-b p-5 cursor-pointer'}>Upload Book</button>
+            <button onClick={() => setTab("status")} className={tab == "status" ? 'border-l border-t border-r  p-5 cursor-pointer' : 'border-b p-5 cursor-pointer'}>Upload Books Status</button>
+            <button onClick={() => setTab("history")} className={tab == "history" ? 'border-l border-t border-r  p-5 cursor-pointer' : 'border-b p-5 cursor-pointer'}>Purchase History</button>
           </div>
 
           {
             tab == "upload" &&
             <div className="flex justify-center py-10 text-xl mt-10">
-              <UploadBooks/>
+              <UploadBooks />
             </div>
           }
 
           {
             tab == "status" &&
             <div className="flex justify-center py-10 text-xl mt-10">
-              <BookStatus/>
+              <BookStatus />
             </div>
           }
 
           {
             tab == "history" &&
             <div className="flex justify-center py-10 text-xl mt-10">
-              <PurchaseHistory/>
+              <PurchaseHistory />
             </div>
           }
         </div>

@@ -32,6 +32,9 @@ bookstoreServer.use((err ,req ,res ,next) => {
 // use routes
 bookstoreServer.use(router)
 
+// static
+bookstoreServer.use("/uploads",express.static("./uploads"))
+
 // 6. setup port number to run the server in browser
 const PORT = process.env.PORT
 

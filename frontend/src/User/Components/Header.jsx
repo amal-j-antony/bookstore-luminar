@@ -5,16 +5,30 @@ import { IoMdLogOut, IoMdPerson, IoMdSettings } from 'react-icons/io'
 import { Link } from 'react-router-dom'
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useEffect } from 'react'
+import axiosInstance from '../../services/axiosInstance'
 
 function Header() {
   const [toggle, setToggle] = useState(false)
   console.log(toggle);
   const [token, setToken] = useState("")
   const [dropdown, setDropdown] = useState(false)
+  const [userData,setUserData] = useState({})
 
   useEffect(() => {
     setToken(sessionStorage.getItem("token"))
-  }, {})
+    if (sessionStorage.getItem("user")) {
+      const data = JSON.parse(sessionStorage.getItem("user"))
+      console.log(data);
+      setUserData({
+        ...userData,
+        username: data?.username,
+        bio: data?.bio,
+        profileImage: data?.profileImage,
+        userID: data._id
+      })
+      
+    }
+  },[])
 
   return (
     <>
@@ -34,7 +48,12 @@ function Header() {
           {
             token ?
               <section onClick={()=>setDropdown(!dropdown)} className='relative'>
-                <button  className='ms-5 text-xl flex items-center border border-black hover:bg-black hover:text-white p-3 rounded-full duration-500 cursor-pointer'><IoMdPerson /></button>
+                <button  className='ms-5 text-xl flex items-center border border-black hover:bg-black hover:text-white rounded-full duration-500 cursor-pointer'>{
+                  userData? 
+                  <img src={`${axiosInstance.defaults.baseURL}/uploads/${userData.profileImage}`} className='rounded-full w-10' alt="" />
+                  :
+                  <IoMdPerson className='m-3' />
+                  }</button>
                 {
                   dropdown &&
                   <div className="absolute right-0  bg-slate-50 z-5 p-2">

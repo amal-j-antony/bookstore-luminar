@@ -14,7 +14,7 @@ router.post("/register",registerController)
 
 router.post("/login",loginController)
 
-router.post("/addBook",jwtAuthMiddleware,addBookController)
+router.post("/addBook",jwtAuthMiddleware,multerMiddleware.array("uploadImages",3),addBookController)
 
 router.post("/approveBook",jwtAdminMiddleware,approveBookController)
 
