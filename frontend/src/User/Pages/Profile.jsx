@@ -43,11 +43,11 @@ function Profile() {
       <div className="w-full flex justify-center items-center mt-30">
         <div className='container flex flex-col'>
           <div className='flex justify-between items-center'>
-            <h1 className='text-xl flex items-center gap-2'>User name <MdVerified /> </h1>
+            <h1 className='text-xl flex items-center gap-2'>{userData?.username} <MdVerified /> </h1>
             <EditProfile />
           </div>
           <div className="pt-5 font-bold">Bookstore User</div>
-          <p className='py-5 text-justify'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi quibusdam alias cupiditate sapiente laboriosam libero et corporis vitae hic quasi reiciendis quia error fugiat corrupti, assumenda asperiores blanditiis aperiam tenetur. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Debitis quasi, eligendi incidunt rerum eaque, in esse molestias voluptatibus vel asperiores commodi deserunt odit cumque doloribus quam! Adipisci odit, nesciunt nihil sit repellendus laboriosam vero et, delectus itaque pariatur laudantium consequatur.</p>
+          <p className='py-5 text-justify'>{userData?.bio}</p>
 
           <div className="flex justify-center">
             <button onClick={() => setTab("upload")} className={tab == "upload" ? ' border-l border-t border-r p-5 cursor-pointer' : 'border-b p-5 cursor-pointer'}>Upload Book</button>
