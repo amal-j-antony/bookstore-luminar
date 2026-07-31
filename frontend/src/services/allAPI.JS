@@ -15,3 +15,9 @@ export const loginAPI = async (reqBody) => {
 export const updateUserProileAPI = async (userID, reqBody) => {
     return await commonAPI("PUT",`/updateUser/${userID}`,reqBody)
 }
+
+
+// add book
+export const addBookAPI = async (bookData) => {
+    return await commonAPI("POST",`/addBook`,bookData)
+}
