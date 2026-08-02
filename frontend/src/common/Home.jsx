@@ -4,9 +4,36 @@ import Footer from './Footer';
 import Preloader from './Preloader';
 import Header from '../User/Components/Header';
 import { Link } from 'react-router-dom'
+import { getHomeBooksAPI } from '../services/allAPI.JS';
 
 function Home() {
   const [isLoading, setIsLoading] = useState(true)
+  const [load, setLoad] = useState(true)
+
+  const [homeBooks, setHomebooks] = useState([])
+  console.log(homeBooks);
+  
+
+  
+
+
+  const getBooks = async () => {
+    try {
+      const result = await getHomeBooksAPI()
+      if (result.status == 200) {
+        setHomebooks(result?.data)
+        setLoad(false)
+      }
+    } catch (error) {
+      console.log(error.message);
+      setLoad(false)
+    }
+  }
+
+  useEffect(() => {
+    getBooks()
+  }, [])
+
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false)
@@ -33,15 +60,27 @@ function Home() {
             <h1>Explore our latest collection</h1>
             <div className="grid grid-cols-4 w-full my-10">
               {/* cards */}
-              <div className="shadow rounded p-3 m-4">
-                <img src="https://m.media-amazon.com/images/I/51LTCXyBRwL._SY445_SX342_FMwebp_.jpg" className='w-full h-[500px]' alt="" />
-                <div className='flex flex-col items-center mt-4'>
-                  <h2 className="font-bold text-blue-500">James Clear</h2>
-                  <h2 className='font-bold'>Atomic Habits</h2>
-                  <p className='text-red-500'>$18.99</p>
-                </div>
-              </div>
-              <p>Loading...</p>
+              {
+                homeBooks.length == 0 ?
+                  <p>Loading...</p>
+                  :
+                  <>
+                    {
+                      homeBooks?.map((item, index) => (
+                        <div className="shadow rounded p-3 m-4">
+                          <img src={item.imageURL} className='w-full h-[500px]' alt="" />
+                          <div className='flex flex-col items-center mt-4'>
+                            <h2 className="font-bold text-blue-500">{item.author}</h2>
+                            <h2 className='font-bold'>{item.bookTitle}</h2>
+                            <p className='text-red-500'>$18.99</p>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </>
+
+              }
+
             </div>
             <div className="text-center my-10">
               <Link to={"/books"} className="bg-black p-3 text-white"> Explore More</Link>

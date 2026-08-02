@@ -21,3 +21,23 @@ export const updateUserProileAPI = async (userID, reqBody) => {
 export const addBookAPI = async (bookData) => {
     return await commonAPI("POST",`/addBook`,bookData)
 }
+
+//get latest books for home page
+export const getHomeBooksAPI = async () => {
+    return await commonAPI("GET",'/getHomeBooks',{})
+}
+
+//get all books
+export const getAllBooksAPI = async() => {
+    return await commonAPI("GET",'/getAllBooks',{})
+}
+
+//view book
+export const viewBookAPI = async (bookID) => {
+    return await commonAPI("GET",`/viewBook/${bookID}`,{})
+}
+
+//get books uploaded by user
+export const getBooksUploadedAPI = async () => {
+    return await commonAPI('GET',`/userBooks`,{})
+}

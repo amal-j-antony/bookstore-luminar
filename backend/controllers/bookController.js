@@ -15,7 +15,10 @@ exports.addBookController = async (req, res) => {
         console.log(existingBook);
         
         if (existingBook) {
-            res.status(409).json("Error: User has added book already")
+            res.status(409).json({
+                error: 409,
+                message: "Book already exists "
+            })
         } else {
             const newBook = await books.create({
                 bookTitle, publisher, author, isbn, imageURL, language, totalPages, category, price, discountPrice, abstract, uploadImages, sellerEmail
@@ -39,4 +42,52 @@ exports.approveBookController = async (req, res) => {
     console.log('Approve book initialized');
     res.status(200).json("Book Approved")
 
+}
+
+exports.getHomeBooks = async (req,res) => {
+    console.log('Get books');
+    try {
+        const bookList = await books.find().sort({_id: -1}).limit(4)
+        res.status(200).json(bookList)
+    } catch (error) {
+        res.status(500).json({
+            status: "Server error",
+            message: error.message
+        })   
+    }
+}
+
+exports.getAllBooksController = async (req,res) => {
+    const sellerEmail = req.email
+    try {
+        const result = await books.find({sellerEmail: {$ne: sellerEmail}})
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(500).json({
+            error: "server error",
+            details: error.message
+        })
+    }
+}
+
+exports.viewBookController = async (req,res) => {
+    const {id} = req.params
+    try {
+        const result = await books.findById({_id: id})
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+}
+
+
+//get books uploaded by user
+exports.getUserUploadedBooks = async (req,res) => {
+    const sellerEmail = req.email
+    try {
+        const result = await books.find({sellerEmail})
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
 }

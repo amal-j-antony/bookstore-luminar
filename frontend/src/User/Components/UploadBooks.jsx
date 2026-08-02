@@ -27,7 +27,7 @@ function UploadBooks() {
                 const url = URL.createObjectURL(imageFile)
                 setPreview(url)
                 setPreviewList([...previewList, url])
-            }else{
+            } else {
                 toast.info("error")
             }
 
@@ -40,37 +40,50 @@ function UploadBooks() {
     }
 
     const handleUpload = async () => {
-        const { bookTitle, publisher, author, isbn, imageURL, language, totalPages, category, price, discountPrice, abstract ,uploadImages } = bookDetails
-        if(bookTitle&&
-            publisher&&
-            author&&
-            isbn&&
-            imageURL&&
-            language&&
-            totalPages&&
-            category&&
-            price&&
-            discountPrice&&
-            abstract&&
-            uploadImages.length>0
-        ){
+        const { bookTitle, publisher, author, isbn, imageURL, language, totalPages, category, price, discountPrice, abstract, uploadImages } = bookDetails
+        if (bookTitle &&
+            publisher &&
+            author &&
+            isbn &&
+            imageURL &&
+            language &&
+            totalPages &&
+            category &&
+            price &&
+            discountPrice &&
+            abstract &&
+            uploadImages.length > 0
+        ) {
             const reqBody = new FormData()
-            for(let key in bookDetails){
-                if(key != "uploadImages"){
-                    reqBody.append(key,bookDetails[key])
-                }else{
+            for (let key in bookDetails) {
+                if (key != "uploadImages") {
+                    reqBody.append(key, bookDetails[key])
+                } else {
                     bookDetails.uploadImages.forEach(image => {
-                        reqBody.append("uploadImages",image)
+                        reqBody.append("uploadImages", image)
                     })
                 }
             }
             const result = await addBookAPI(reqBody)
-            if(result.status == 200){
+            console.log(result);
+            
+            if (result.status == 200) {
                 toast.success('Book added successfully')
+                handleReset()
+            }else{
+                toast.error(result.message)
             }
-        }else{
+        } else {
             toast.info("Please fill all Fields")
         }
+    }
+
+    const handleReset = () => {
+        setBookDetails({
+            bookTitle: "", publisher: "", author: "", isbn: "", imageURL: "", language: "", totalPages: "", category: "", price: "", discountPrice: "", abstract: "", uploadImages: []
+        })
+        setPreview("")
+        setPreviewList([])
     }
 
 
@@ -98,7 +111,7 @@ function UploadBooks() {
                             {preview ? <img src={preview} className='h-60' alt="" /> : <MdCloudUpload className='text-[200px] cursor-pointer' />}
                         </label>
                         <div className="flex justify-center items-center">
-                            {previewList &&
+                            {previewList.length>0 &&
                                 <>
                                     {
                                         previewList.map((item) => (
@@ -114,7 +127,7 @@ function UploadBooks() {
                                 </>}
                         </div>
                         <div className="flex justify-center gap-5">
-                            <button className='text-white bg-green-500 py-2 px-3'>Reset</button>
+                            <button onClick={handleReset} className='text-white bg-green-500 py-2 px-3'>Reset</button>
                             <button onClick={handleUpload} className='text-white bg-blue-500 py-2 px-3'>Add Book Details</button>
                         </div>
                     </div>

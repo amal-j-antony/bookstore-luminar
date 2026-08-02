@@ -11,9 +11,7 @@ import { useEffect } from 'react';
 
 function Profile() {
   const [tab, setTab] = useState("upload")
-  const [userData, setUserData] = useState({
-
-  })
+  const [userData, setUserData] = useState({})
   
 
   useEffect(() => {
