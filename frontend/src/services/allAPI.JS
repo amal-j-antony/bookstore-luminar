@@ -41,3 +41,12 @@ export const viewBookAPI = async (bookID) => {
 export const getBooksUploadedAPI = async () => {
     return await commonAPI('GET',`/userBooks`,{})
 }
+
+//get Purchase history
+export const getPurchaseHistory = async () => {
+    return await commonAPI('GET',`/purchaseHistory`)
+}
+//delete book 
+export const deleteBookAPI = async (bookID) => {
+    return await commonAPI('DELETE',`/deleteBook/${bookID}`,{})
+}

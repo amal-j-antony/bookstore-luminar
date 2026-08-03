@@ -18,6 +18,8 @@ const jwtAuthMiddleware = (req, res, next) => {
         } catch (error) {
             res.status(401).json('Authorization failed..')
         }
+    }else {
+        res.status(400).json("No bearer token found")
     }
 }
 

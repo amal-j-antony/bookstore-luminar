@@ -9,11 +9,11 @@ exports.addBookController = async (req, res) => {
         const uploadImages = req.files.map(item => item.filename)
         const sellerEmail = req.email
         console.log(sellerEmail);
-        
+
 
         const existingBook = await books.findOne({ bookTitle, sellerEmail })
         console.log(existingBook);
-        
+
         if (existingBook) {
             res.status(409).json({
                 error: 409,
@@ -44,23 +44,23 @@ exports.approveBookController = async (req, res) => {
 
 }
 
-exports.getHomeBooks = async (req,res) => {
+exports.getHomeBooks = async (req, res) => {
     console.log('Get books');
     try {
-        const bookList = await books.find().sort({_id: -1}).limit(4)
+        const bookList = await books.find().sort({ _id: -1 }).limit(4)
         res.status(200).json(bookList)
     } catch (error) {
         res.status(500).json({
             status: "Server error",
             message: error.message
-        })   
+        })
     }
 }
 
-exports.getAllBooksController = async (req,res) => {
+exports.getAllBooksController = async (req, res) => {
     const sellerEmail = req.email
     try {
-        const result = await books.find({sellerEmail: {$ne: sellerEmail}})
+        const result = await books.find({ sellerEmail: { $ne: sellerEmail } })
         res.status(200).json(result)
     } catch (error) {
         res.status(500).json({
@@ -70,10 +70,10 @@ exports.getAllBooksController = async (req,res) => {
     }
 }
 
-exports.viewBookController = async (req,res) => {
-    const {id} = req.params
+exports.viewBookController = async (req, res) => {
+    const { id } = req.params
     try {
-        const result = await books.findById({_id: id})
+        const result = await books.findById({ _id: id })
         res.status(200).json(result)
     } catch (error) {
         res.status(500).json(error.message)
@@ -82,12 +82,40 @@ exports.viewBookController = async (req,res) => {
 
 
 //get books uploaded by user
-exports.getUserUploadedBooks = async (req,res) => {
+exports.getUserUploadedBooks = async (req, res) => {
     const sellerEmail = req.email
     try {
-        const result = await books.find({sellerEmail})
+        const result = await books.find({ sellerEmail })
         res.status(200).json(result)
     } catch (error) {
         res.status(500).json(error.message)
+    }
+}
+
+exports.getPurchaseHistory = async (req, res) => {
+    const email = req.email
+    try {
+        const result = await books.find({ boughtBy: email })
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(500).json(error.message)
+    }
+}
+
+exports.deleteBookController = async (req, res) => {
+    const { bookID } = req.params
+
+    try {
+        const result = await books.findByIdAndDelete({ _id: bookID })
+        res.status(200).json({
+            message: "Book deleted successfully",
+            bookDetails: result
+        })
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Book delete error",
+            bookDetails: error.message
+        })
     }
 }

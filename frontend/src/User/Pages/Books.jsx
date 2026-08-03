@@ -2,11 +2,18 @@ import React, { useEffect, useState } from 'react'
 import Header from '../Components/Header'
 import { Link } from 'react-router-dom'
 import { getAllBooksAPI } from '../../services/allAPI.JS'
+import { all } from 'axios'
 
 
-function Books() {
-
+function Books() {  
+  const [category,setCategory] = useState("all")
+  const [booksFilter,setBooksFIlter] = useState([])
   const [allBooks, setAllBooks] = useState([])
+  const [categoryList, setCategoryList] = useState([])
+  const [search,setSearch] = useState("")
+  console.log(categoryList);
+  let timeout
+
   const [token, setToken] = useState('')
   console.log(allBooks);
 
@@ -16,6 +23,9 @@ function Books() {
       const result = await getAllBooksAPI()
       if (result.status == 200) {
         setAllBooks(result?.data)
+        setBooksFIlter(result?.data)
+        const bookCategory = result.data.map(item => item.category)
+        setCategoryList([...new Set(bookCategory)])
       }
 
     } catch (error) {
@@ -23,9 +33,31 @@ function Books() {
     }
   }
 
-  useEffect(() => {
+  const searchBook = (e) => {
+    console.log(e.target.value);
+    clearTimeout(timeout)
+    console.log(category);
+    
+    timeout = setTimeout(()=>{
+      setBooksFIlter(allBooks.filter(item=> {
+        if(item.bookTitle.toLowerCase().includes(e.target.value.toLowerCase()) && (item.category == category || category == "all")){
+          return item
+        }
+      } ))
+    },500)
+  }
 
-  })
+  const handleFilter = (category) => {
+    console.log(category);
+    setCategory(category)
+    if(category == "all"){
+      setBooksFIlter(allBooks)
+    }else{
+      setBooksFIlter(allBooks.filter(item=> item.category == category))
+    }
+  }
+
+  
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token")
@@ -45,7 +77,7 @@ function Books() {
             <div className="flex flex-col justify-center items-center my-3">
               <h1 className='text-3xl font-bold my-5' >ALL BOOKS</h1>
               <div className="flex my-5">
-                <input type="text" placeholder='Search Books By Title...!' className='p-2 border border-gray-200 w-100' />
+                <input value={search} onChange={(e)=>{setSearch(e.target.value),searchBook(e)}} type="text" placeholder='Search Books By Title...!' className='p-2 border border-gray-200 w-100' />
                 <button className='p-2 bg-blue-800 text-white'>Search</button>
               </div>
             </div>
@@ -54,13 +86,17 @@ function Books() {
               <div className="col-span-1">
                 <h1>Filter</h1>
                 <div className="flex gap-5">
-                  <input type="radio" name="filter" id="All" />
+                  <input onChange={()=>handleFilter("all")} type="radio" name="filter" value="All" />
                   <label htmlFor="All">All</label>
-                </div>
-                <div className="flex gap-5">
-                  <input type="radio" name="filter" id="history" />
-                  <label htmlFor="history">History</label>
-                </div>
+                </div>                
+                {
+                  categoryList.map((item, index) => (
+                    <div key={"ert"+index} className="flex gap-5">
+                      <input onChange={()=>handleFilter(item)} type="radio" name="filter" value={item} id={item} />
+                      <label htmlFor={item}>{item}</label>
+                    </div>
+                  ))
+                }
               </div>
               <div className="col-span-3">
                 <div className="grid grid-cols-4 w-full">
@@ -70,7 +106,7 @@ function Books() {
                       :
                       <>
                         {
-                          allBooks.map((item, index) => (
+                          booksFilter.map((item, index) => (
                             <div key={"sdfsdfa" + index} className="shadow-lg rounded p-3 m-4">
                               <img src={item.imageURL} className='w-full h-[350px]' alt="" />
                               <div className='flex flex-col items-center mt-4'>

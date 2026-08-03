@@ -1,6 +1,6 @@
 const express = require('express')
 const { registerController, loginController, updateUserController } = require('../controllers/userController')
-const { addBookController,approveBookController, getHomeBooks, getAllBooksController, viewBookController, getUserUploadedBooks } = require('../controllers/bookController')
+const { addBookController,approveBookController, getHomeBooks, getAllBooksController, viewBookController, getUserUploadedBooks, getPurchaseHistory, deleteBookController } = require('../controllers/bookController')
 const jwtAuthMiddleware = require('../middlewares/jwtAuthmiddleware')
 const jwtAdminMiddleware = require('../middlewares/jwtAdminMiddleware')
 const multerMiddleware = require('../middlewares/multerMiddleware')
@@ -27,5 +27,9 @@ router.get('/getAllBooks',jwtAuthMiddleware,getAllBooksController)
 router.get('/viewBook/:id',jwtAuthMiddleware,viewBookController)
 
 router.get("/userBooks",jwtAuthMiddleware,getUserUploadedBooks)
+
+router.get("/purchaseHistory",jwtAuthMiddleware,getPurchaseHistory)
+
+router.delete("/deleteBook/:bookID",jwtAuthMiddleware,deleteBookController)
 
 module.exports = router

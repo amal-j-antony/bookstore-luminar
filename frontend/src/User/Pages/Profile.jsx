@@ -62,14 +62,14 @@ function Profile() {
 
           {
             tab == "status" &&
-            <div className="flex justify-center py-10 text-xl mt-10">
+            <div className="flex justify-center text-xl">
               <BookStatus />
             </div>
           }
 
           {
             tab == "history" &&
-            <div className="flex justify-center py-10 text-xl mt-10">
+            <div className="flex justify-center text-xl">
               <PurchaseHistory />
             </div>
           }
