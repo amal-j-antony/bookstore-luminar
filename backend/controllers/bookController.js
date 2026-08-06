@@ -39,8 +39,23 @@ exports.addBookController = async (req, res) => {
 }
 
 exports.approveBookController = async (req, res) => {
+    const {bookID} = req.params
     console.log('Approve book initialized');
-    res.status(200).json("Book Approved")
+    try {
+        const result = await books.updateOne({_id: bookID},{$set:{status: "Approved"}})
+        // books.findByIdAndUpdate({_id: bookID},{status: "approved"},{new:true})
+        // findByIdAndUpdate can also be used here
+        res.status(200).json({
+            message: "Book approved",
+            data: result
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went Wrong",
+            details: error.message
+        })
+    }
+    
 
 }
 
@@ -116,6 +131,20 @@ exports.deleteBookController = async (req, res) => {
         res.status(500).json({
             message: "Book delete error",
             bookDetails: error.message
+        })
+    }
+}
+
+//admin: get all books
+exports.getAllBooksAdminController = async (req, res) => {
+    const sellerEmail = req.email
+    try {
+        const result = await books.find()
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(500).json({
+            error: "server error",
+            details: error.message
         })
     }
 }

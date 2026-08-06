@@ -6,12 +6,15 @@ import * as Yup from 'yup'
 import { registerAPI } from '../services/allAPI.JS'
 import { loginAPI } from '../services/allAPI.JS'
 import { toast } from 'react-toastify'
+import { GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from "jwt-decode";
+import { googleAuthAPI } from '../services/allAPI.JS'
 
 
 function Auth({ insideRegister }) {
   // console.log(insideRegister);
   const navigate = useNavigate()
-  
+
   const form = useFormik({
     // initial values
     initialValues: {
@@ -46,46 +49,70 @@ function Auth({ insideRegister }) {
     try {
       const result = await registerAPI(userData)
       console.log(result);
-      if(result.status == 201){
+      if (result.status == 201) {
         toast.success("Register Successful")
         form.resetForm()
         navigate("/login")
-      }else{
+      } else {
         toast.error('Something went wrong')
         console.log("error");
-        
+
       }
     } catch (error) {
-      console.log(error);      
+      console.log(error);
     }
   }
 
-  const handleLogin = async (userData) =>  {
+  const handleLogin = async (userData) => {
     try {
       const result = await loginAPI(userData)
       console.log(result);
-      if(result.status == 200){
+      if (result.status == 200) {
         // alert("Login Successful")
         toast.success("Login success")
-        sessionStorage.setItem("user",JSON.stringify(result.data.user))
-        sessionStorage.setItem("token",result.data.token)
+        sessionStorage.setItem("user", JSON.stringify(result.data.user))
+        sessionStorage.setItem("token", result.data.token)
         form.resetForm()
-        if(result.data.user.role == "admin"){
+        if (result.data.user.role == "admin") {
           navigate("/admindashboard")
-        }else{
+        } else {
           navigate("/")
         }
-      }else if(result.status === 409){
+      } else if (result.status === 409) {
         toast.error("Invalid credentials")
-      }else if(result.status === 400){
+      } else if (result.status === 400) {
         toast.error('Account does not exist, please register')
-      }else{
+      } else {
         toast("Something went wrong")
       }
-      
+
     } catch (error) {
       console.log(error);
-      
+
+    }
+  }
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    const decodeJWT = jwtDecode(credentialResponse.credential)
+    const { email, name, picture } = decodeJWT
+    console.log(decodeJWT);
+    const result = await googleAuthAPI({ email, username: name, profileImage: picture })
+    console.log(result);
+    if (result.status == 200) {
+      // alert("Login Successful")
+      toast.success("Login success")
+      sessionStorage.setItem("user", JSON.stringify(result.data.user))
+      sessionStorage.setItem("token", result.data.token)
+      form.resetForm()
+      if (result.data.user.role == "admin") {
+        navigate("/admindashboard")
+      } else {
+        navigate("/")
+      }
+    } else if (result.status === 409) {
+      toast.error("Invalid credentials")
+    } else {
+      toast("Something went wrong")
     }
   }
   return (
@@ -111,7 +138,7 @@ function Auth({ insideRegister }) {
               insideRegister ?
                 <>
                   <h1 className='text-center text-4xl py-5 font-bold' >Register</h1>
-                  
+
                 </>
                 :
                 <h1 className='text-center text-4xl py-5 font-bold' >Login</h1>
@@ -121,17 +148,17 @@ function Auth({ insideRegister }) {
               insideRegister && <div className="flex flex-col">
                 <label className='my-3' htmlFor="">Username</label>
                 <input name='username' value={form.values.username} onChange={form.handleChange} type="text" className='border rounded-2xl py-2 mb-5 placeholder:text-slate-500 placeholder:text-center text-center' placeholder='Enter username' />
-                { form.errors.username && <div className="text-yellow-500">{form.errors.username}</div>}
+                {form.errors.username && <div className="text-yellow-500">{form.errors.username}</div>}
               </div>
             }
 
 
             <label className='my-3' htmlFor="">Email</label>
             <input name='email' value={form.values.email} onChange={form.handleChange} type="text" className='border rounded-2xl py-2 mb-5 placeholder:text-slate-500 placeholder:text-center text-center' placeholder='Enter email' />
-            { form.errors.email && <div className="text-yellow-500">{form.errors.email}</div>}
+            {form.errors.email && <div className="text-yellow-500">{form.errors.email}</div>}
             <label className='my-3' htmlFor="">Password</label>
             <input name='password' value={form.values.password} onChange={form.handleChange} type="password" className='border rounded-2xl py-2 mb-1 placeholder:text-slate-500 placeholder:text-center text-center' placeholder='Enter password' />
-            { form.errors.password && <div className="text-yellow-500">{form.errors.password}</div>}
+            {form.errors.password && <div className="text-yellow-500">{form.errors.password}</div>}
             <p className='mb-5'>*Never share your password with others</p>
             <button type='submit' className='bg-slate-700 p-3 rounded-2xl cursor-pointer text-xl mb-4'>
               {
@@ -143,8 +170,18 @@ function Auth({ insideRegister }) {
                 :
                 <Link to={"/login"} className='text-center' >Already have an account? <u className='text-blue-500'>Login</u></Link>
             }
-
+            <GoogleLogin
+              onSuccess={credentialResponse => {
+                console.log(credentialResponse);
+                handleGoogleLogin(credentialResponse)
+              }}
+              onError={() => {
+                console.log('Login Failed');
+              }}
+            />
           </form>
+          {/* google */}
+
         </div>
 
 

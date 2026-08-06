@@ -50,3 +50,28 @@ export const getPurchaseHistory = async () => {
 export const deleteBookAPI = async (bookID) => {
     return await commonAPI('DELETE',`/deleteBook/${bookID}`,{})
 }
+
+//admin : get pending books
+export const getAllBooksAdminAPI = async() => {
+    return await commonAPI("GET",'/allBooks/admin',{})
+}
+
+//admin: approve book
+export const approveBookAPI = async (bookID) => {
+    return await commonAPI('PUT',`/approveBook/${bookID}`,{})
+}
+
+//admin: get users
+export const getUsersAPI = async () => {
+    return await commonAPI('GET','/getUsers',{})
+}
+
+//admin: update profile
+export const updateAdminAPI = async (id,reqBody) => {
+    return await commonAPI('PUT',`/updateAdmin/${id}`,reqBody)
+}
+
+//google auth
+export const googleAuthAPI = async (reqBody) => {
+    return await commonAPI('POST',`/googleAuth`,reqBody)
+}

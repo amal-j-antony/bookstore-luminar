@@ -1,7 +1,8 @@
 // user register
 const users = require("../models/usersModel")
 const bcrypt = require("bcrypt")
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { findByIdAndUpdate } = require("../models/bookModel");
 
 
 exports.registerController = async (req, res) => {
@@ -97,5 +98,79 @@ exports.updateUserController = async (req, res) => {
             message: "Something went wrong",
             details: error
         })
+    }
+}
+
+exports.getAllUsersController = async (req, res) => {
+    try {
+        const data = await users.find({ role: { $ne: "admin" } })
+        res.status(200).json(data)
+    } catch (error) {
+        res.status(500).json({
+            error: "Something went wrong",
+            details: error.message
+        })
+    }
+}
+
+exports.updateAdminController = async (req, res) => {
+    const { id } = req.params
+    const updateData = {}
+    const { username, password, profileImage } = req.body
+    console.log(req.body, req.params);
+
+    if (username) {
+        updateData.username = username
+    }
+    if (password) {
+        updateData.password = await bcrypt.hash(password, 10)
+    }
+    if (req.file) {
+        updateData.profileImage = req.file.filename
+    }
+    try {
+        const result = await users.findByIdAndUpdate({ _id: id }, updateData, { returnDocument: "after" })
+        res.status(200).json({
+            status: "success",
+            details: result
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: "Error: Something went wrong",
+            details: error.message
+        })
+    }
+}
+
+//google controller
+exports.googleAuthCOntroller = async (req, res) => {
+    const { email, username, profileImage } = req.body
+    console.log(req.body);
+    
+    try {
+        const existingUser = await users.findOne({ email })
+        if (existingUser) {
+            const token = jwt.sign({ usermail: existingUser.email, role: existingUser.role }, "sheepCalmCapy")
+            res.status(200).json({
+                existingUser: existingUser, token
+            })
+        } else {
+            const password= await bcrypt.hash(crypto.randomUUID(),10)
+            const newUser = await users.create({
+                username, email, password, profileImage, authProvider: "google"
+            })
+            const token = jwt.sign({ usermail: email, role:newUser.role }, "sheepCalmCapy")
+            res.status(200).json({
+                existingUser: newUser, token
+            })
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            error: "server error",
+            message: error.message
+        })
+        
+        
     }
 }

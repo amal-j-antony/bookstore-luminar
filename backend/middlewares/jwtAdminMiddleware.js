@@ -10,7 +10,7 @@ const jwtAdminMiddleware = (req, res, next) => {
         if(jwtResponse.role == "admin"){
             next()
         }else{
-            res.status(402).json("Unauthorized")
+            res.status(401).json("Unauthorized")
         }
     } catch (error) {
         res.status(400).json(error)
