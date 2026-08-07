@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { IoIosSearch, IoMdHome } from "react-icons/io";
 import Footer from './Footer';
 import Preloader from './Preloader';
 import Header from '../User/Components/Header';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getHomeBooksAPI } from '../services/allAPI.JS';
+import { ShareContext } from '../contextShare/SearchContext';
+import { toast } from 'react-toastify';
+
 
 function Home() {
   const [isLoading, setIsLoading] = useState(true)
@@ -13,7 +16,9 @@ function Home() {
   const [homeBooks, setHomebooks] = useState([])
   console.log(homeBooks);
   
-
+  const {searchKey,setSearchKey} = useContext(ShareContext)
+  
+const navigate = useNavigate()
   
 
 
@@ -27,6 +32,19 @@ function Home() {
     } catch (error) {
       console.log(error.message);
       setLoad(false)
+    }
+  }
+
+  const handleSearch = () => {
+    if(!searchKey) {
+      toast("Pleasae enter a book title")
+    }else if(!sessionStorage.getItem("token")){
+      toast("Please login to search")
+      navigate("/login")
+    }else if(searchKey && sessionStorage.getItem("token")){
+      navigate("/books")
+    }else{
+      toast.error("Somthing went wrong,please try again")
     }
   }
 
@@ -50,8 +68,8 @@ function Home() {
               <h1 className='text-6xl font-bold'>Wonderful Gifts</h1>
               <p>Gift your family and friends </p>
               <div className=' flex items-center'>
-                <input type="text" className='bg-white p-2 rounded-3xl w-100' placeholder='Search For A Book' />
-                <IoIosSearch className='text-gray-500 cursor-pointer text-2xl -ms-10' />
+                <input onChange={(e)=>setSearchKey(e.target.value)} type="text" className='bg-white p-2 rounded-3xl w-100 text-black' placeholder='Search For A Book' />
+                <IoIosSearch onClick={handleSearch} className='text-gray-500 cursor-pointer text-2xl -ms-10' />
               </div>
             </div>
           </div>

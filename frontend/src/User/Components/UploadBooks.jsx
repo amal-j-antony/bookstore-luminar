@@ -1,14 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { BsCloudUploadFill } from "react-icons/bs";
 import { MdCloudUpload } from "react-icons/md";
 import { toast } from 'react-toastify';
 import { addBookAPI } from '../../services/allAPI.JS';
+import useDebounce from '../../hooks/useDebounce,js';
+import { generateAbstractAPI } from '../../services/allAPI.JS';
 
 function UploadBooks() {
+    
     const [bookDetails, setBookDetails] = useState({
         bookTitle: "", publisher: "", author: "", isbn: "", imageURL: "", language: "", totalPages: "", category: "", price: "", discountPrice: "", abstract: "", uploadImages: []
     })
+    const debounceTitleSearch = useDebounce(bookDetails?.bookTitle,2000)
     const [preview, setPreview] = useState("")
     const [previewList, setPreviewList] = useState([])
     console.log(bookDetails);
@@ -86,6 +90,24 @@ function UploadBooks() {
         setPreviewList([])
     }
 
+    useEffect(()=>{
+        if(debounceTitleSearch){
+            console.log('Ready for api call')            
+            generateAbstract()
+        }
+    },[debounceTitleSearch])
+
+    const generateAbstract = async () => {
+        const result = await generateAbstractAPI(debounceTitleSearch)
+        console.log(result);
+        
+        if(result.status == 200){
+            setBookDetails({...bookDetails,
+                abstract:result.data.message
+            })
+        }
+    }
+
 
     return (
         <>
@@ -99,7 +121,7 @@ function UploadBooks() {
                         <input value={bookDetails.totalPages} onChange={(e) => handleInput(e, "totalPages")} type="text" placeholder='Total Pages' className='w-full bg-white p-2 mb-5' />
                         <input value={bookDetails.price} onChange={(e) => handleInput(e, "price")} type="text" placeholder='Original Price' className='w-full bg-white p-2 mb-5' />
                         <input value={bookDetails.discountPrice} onChange={(e) => handleInput(e, "discountPrice")} type="text" placeholder='Disocunt Price' className='w-full bg-white p-2 mb-5' />
-                        <textarea value={bookDetails.abstract} onChange={(e) => handleInput(e, "abstract")} type="text" placeholder='Abstract' className='w-full bg-white p-2 mb-5' />
+                        <textarea value={bookDetails.abstract} onChange={(e) => handleInput(e, "abstract")} type="text" placeholder='Abstract' className='w-full max-h-50 h-full bg-white p-2 mb-5' />
                     </div>
                     <div className="">
                         <input value={bookDetails.publisher} onChange={(e) => handleInput(e, "publisher")} type="text" placeholder='Publisher' className='w-full bg-white p-2 my-5' />

@@ -1,9 +1,10 @@
 const express = require('express')
 const { registerController, loginController, updateUserController, getAllUsersController, updateAdminController, googleAuthCOntroller } = require('../controllers/userController')
-const { addBookController,approveBookController, getHomeBooks, getAllBooksController, viewBookController, getUserUploadedBooks, getPurchaseHistory, deleteBookController, getAllBooksAdminController } = require('../controllers/bookController')
+const { addBookController,approveBookController, getHomeBooks, getAllBooksController, viewBookController, getUserUploadedBooks, getPurchaseHistory, deleteBookController, getAllBooksAdminController, generateBookAbstractController } = require('../controllers/bookController')
 const jwtAuthMiddleware = require('../middlewares/jwtAuthmiddleware')
 const jwtAdminMiddleware = require('../middlewares/jwtAdminMiddleware')
 const multerMiddleware = require('../middlewares/multerMiddleware')
+
 
 //To setup routesoutside express server create object for router class of express.
 const router = new express.Router()
@@ -39,5 +40,7 @@ router.get("/getUsers",jwtAdminMiddleware,getAllUsersController)
 router.put("/updateAdmin/:id",jwtAdminMiddleware,multerMiddleware.single("profileImage"),updateAdminController)
 //google auth
 router.post("/googleAuth",googleAuthCOntroller)
+//genai
+router.post("/abstract/generate",jwtAuthMiddleware,generateBookAbstractController)
 
 module.exports = router

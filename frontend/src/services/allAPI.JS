@@ -28,8 +28,8 @@ export const getHomeBooksAPI = async () => {
 }
 
 //get all books
-export const getAllBooksAPI = async() => {
-    return await commonAPI("GET",'/getAllBooks',{})
+export const getAllBooksAPI = async(searchKey) => {
+    return await commonAPI("GET",`/getAllBooks?search=${searchKey}`,{})
 }
 
 //view book
@@ -74,4 +74,9 @@ export const updateAdminAPI = async (id,reqBody) => {
 //google auth
 export const googleAuthAPI = async (reqBody) => {
     return await commonAPI('POST',`/googleAuth`,reqBody)
+}
+
+//abstrat
+export const generateAbstractAPI = async (bookTitle) => {
+    return await commonAPI('POST','/abstract/generate',{bookTitle})
 }

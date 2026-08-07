@@ -1,11 +1,29 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { FaLocationDot } from "react-icons/fa6";
 import { FaPhone, FaPaperPlane } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
 import Footer from './Footer';
 import Header from '../User/Components/Header';
+import emailjs from '@emailjs/browser';
 
 function Contact() {
+    const form = useRef();
+    const sendEmail = (e) => {
+        e.preventDefault();
+
+        emailjs
+            .sendForm(import.meta.env.VITE_SERVICE_ID, import.meta.env.VITE_TEMPLATE_ID, form.current, {
+                publicKey: import.meta.env.VITE_PUBLIC_KEY,
+            })
+            .then(
+                () => {
+                    console.log('SUCCESS!');
+                },
+                (error) => {
+                    console.log('FAILED...', error.text);
+                },
+            );
+    };
     return (
         <>
             <Header />
@@ -43,16 +61,16 @@ function Contact() {
                         </div>
                     </div>
                     <div className="w-[80%] grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="flex flex-col items-center bg-zinc-200 p-10 gap-5">
+                        <form ref={form} onSubmit={sendEmail} className="flex flex-col items-center bg-zinc-200 p-10 gap-5">
                             <h1 className='text-3xl font-bold pb-5'>Send Us A Message!</h1>
-                            <input type="text" placeholder='Name' className='bg-slate-50 w-full p-3' />
-                            <input type="text" placeholder='E Mail' className='bg-slate-50 w-full p-3' />
-                            <input type="text" placeholder='Message' className='bg-slate-50 w-full p-3' />
-                            <button className='bg-black w-full flex p-3 text-white justify-center items-center gap-3 font-bold'>
+                            <input required name='name' type="text" placeholder='Name' className='bg-slate-50 w-full p-3' />
+                            <input required name='email' type="text" placeholder='E Mail' className='bg-slate-50 w-full p-3' />
+                            <textarea required name='message' type="text" placeholder='Message' className='bg-slate-50 w-full p-3' />
+                            <button type='submit' className='bg-black w-full flex p-3 text-white justify-center items-center gap-3 font-bold'>
                                 <span className='text-xl'>Submit</span>
                                 <FaPaperPlane />
                             </button>
-                        </div>
+                        </form>
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.9751535682262!2d76.34006231158298!3d10.018908872665701!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080ffce877d5ef%3A0x8bef6870ad11b98!2sLuminar%20Technolab%20-%20Software%20training%20institute%20in%20Kochi!5e0!3m2!1sen!2sin!4v1783331739929!5m2!1sen!2sin" width="600" height="450" referrerpolicy="strict-origin-when-cross-origin"></iframe>
                     </div>
 

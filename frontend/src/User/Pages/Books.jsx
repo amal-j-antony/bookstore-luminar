@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Header from '../Components/Header'
 import { Link } from 'react-router-dom'
 import { getAllBooksAPI } from '../../services/allAPI.JS'
 import { all } from 'axios'
+import SearchContext, { ShareContext } from '../../contextShare/SearchContext'
 
 
 function Books() {  
@@ -11,6 +12,7 @@ function Books() {
   const [allBooks, setAllBooks] = useState([])
   const [categoryList, setCategoryList] = useState([])
   const [search,setSearch] = useState("")
+  const {searchKey,setSearchKey} = useContext(ShareContext)
   console.log(categoryList);
   let timeout
 
@@ -20,7 +22,7 @@ function Books() {
 
   const getBooks = async () => {
     try {
-      const result = await getAllBooksAPI()
+      const result = await getAllBooksAPI(searchKey)
       if (result.status == 200) {
         setAllBooks(result?.data)
         setBooksFIlter(result?.data)
@@ -66,7 +68,7 @@ function Books() {
       getBooks()
     }
 
-  }, [])
+  }, [searchKey])
 
   return (
     <>
@@ -77,7 +79,7 @@ function Books() {
             <div className="flex flex-col justify-center items-center my-3">
               <h1 className='text-3xl font-bold my-5' >ALL BOOKS</h1>
               <div className="flex my-5">
-                <input value={search} onChange={(e)=>{setSearch(e.target.value),searchBook(e)}} type="text" placeholder='Search Books By Title...!' className='p-2 border border-gray-200 w-100' />
+                <input value={searchKey} onChange={(e)=>{setSearchKey(e.target.value)}} type="text" placeholder='Search Books By Title...!' className='p-2 border border-gray-200 w-100' />
                 <button className='p-2 bg-blue-800 text-white'>Search</button>
               </div>
             </div>

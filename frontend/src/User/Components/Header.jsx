@@ -13,16 +13,16 @@ function Header() {
   console.log(toggle);
   const [token, setToken] = useState("")
   const [dropdown, setDropdown] = useState(false)
-  const [userData,setUserData] = useState({})
+  const [userData, setUserData] = useState({})
   const navigate = useNavigate()
 
   const handleLogout = () => {
     sessionStorage.clear("user")
     sessionStorage.clear("token")
-    setTimeout(()=>{
+    setTimeout(() => {
       navigate('/login')
       toast.success("Logout succeses")
-    },1000)
+    }, 1000)
   }
 
   useEffect(() => {
@@ -37,9 +37,9 @@ function Header() {
         profileImage: data?.profileImage,
         userID: data._id
       })
-      
+
     }
-  },[])
+  }, [])
 
   return (
     <>
@@ -58,18 +58,18 @@ function Header() {
           <FaSquareXTwitter className='h-full text-2xl' />
           {
             token ?
-              <section onClick={()=>setDropdown(!dropdown)} className='relative'>
-                <button  className='ms-5 text-xl flex items-center border border-black hover:bg-black hover:text-white rounded-full duration-500 cursor-pointer'>{
-                  userData?.profileImage ? 
-                  <img src={`${axiosInstance.defaults.baseURL}/uploads/${userData.profileImage}`} className='rounded-full w-10 h-10' alt="" />
-                  :
-                  <IoMdPerson className='m-3' />
-                  }</button>
+              <section onClick={() => setDropdown(!dropdown)} className='relative'>
+                <button className='ms-5 text-xl flex items-center border border-black hover:bg-black hover:text-white rounded-full duration-500 cursor-pointer'>{
+                  userData?.profileImage ?
+                    <img src={userData.profileImage.startsWith('https://lh3.googleusercontent.com/a') ? userData.profileImage : `${axiosInstance.defaults.baseURL}/uploads/${userData.profileImage}`} className='rounded-full w-10 h-10' alt="" />
+                    :
+                    <IoMdPerson className='m-3' />
+                }</button>
                 {
                   dropdown &&
                   <div className="absolute right-0  bg-slate-50 z-5 p-2">
-                    <Link to={"/profile/12"} className='flex items-center gap-2 hover:bg-black hover:text-white duration-500 p-3 cursor-pointer' ><IoMdSettings/> Profile</Link>
-                    <button onClick={handleLogout} className='flex items-center gap-2 hover:bg-black hover:text-white duration-500 p-3 cursor-pointer' ><IoMdLogOut/> Logout</button>
+                    <Link to={"/profile/12"} className='flex items-center gap-2 hover:bg-black hover:text-white duration-500 p-3 cursor-pointer' ><IoMdSettings /> Profile</Link>
+                    <button onClick={handleLogout} className='flex items-center gap-2 hover:bg-black hover:text-white duration-500 p-3 cursor-pointer' ><IoMdLogOut /> Logout</button>
                   </div>
                 }
               </section>

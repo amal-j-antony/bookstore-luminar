@@ -152,7 +152,7 @@ exports.googleAuthCOntroller = async (req, res) => {
         if (existingUser) {
             const token = jwt.sign({ usermail: existingUser.email, role: existingUser.role }, "sheepCalmCapy")
             res.status(200).json({
-                existingUser: existingUser, token
+                user: existingUser, token
             })
         } else {
             const password= await bcrypt.hash(crypto.randomUUID(),10)
@@ -161,7 +161,7 @@ exports.googleAuthCOntroller = async (req, res) => {
             })
             const token = jwt.sign({ usermail: email, role:newUser.role }, "sheepCalmCapy")
             res.status(200).json({
-                existingUser: newUser, token
+                user: newUser, token
             })
         }
     } catch (error) {

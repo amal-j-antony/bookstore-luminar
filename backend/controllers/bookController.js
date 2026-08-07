@@ -1,4 +1,5 @@
 const books = require('../models/bookModel')
+const {GoogleGenerativeAI} = require('@google/generative-ai')
 
 exports.addBookController = async (req, res) => {
     console.log('Inside book controller');
@@ -74,8 +75,12 @@ exports.getHomeBooks = async (req, res) => {
 
 exports.getAllBooksController = async (req, res) => {
     const sellerEmail = req.email
+    const searchKey = req.query.search
+    console.log(searchKey);
+    
+
     try {
-        const result = await books.find({ sellerEmail: { $ne: sellerEmail } })
+        const result = await books.find({ sellerEmail: { $ne: sellerEmail }, bookTitle: {$regex: searchKey,$options: "i"} })
         res.status(200).json(result)
     } catch (error) {
         res.status(500).json({
@@ -146,5 +151,34 @@ exports.getAllBooksAdminController = async (req, res) => {
             error: "server error",
             details: error.message
         })
+    }
+}
+
+//genAi
+
+exports.generateBookAbstractController = async (req,res) => {
+    try {
+        const {bookTitle} = req.body
+        console.log(bookTitle);
+        
+        console.log('Inside genAI');
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API)
+
+        const model = genAI.getGenerativeModel({
+            model: "gemini-3.5-flash-lite"
+        })
+
+        const result = await model.generateContent(`Give me a short abstract of the book ${bookTitle}  without formatting, to be displayed on a bookstore website `)
+        console.log(result.response);
+
+        
+        res.status(200).json({
+            status: "generated",
+            bookTitle,
+            message: result.response.candidates[0].content.parts[0].text,
+            fullResponse: result.response
+        })
+    } catch (error) {
+        res.status(500).json({message: error.message})
     }
 }

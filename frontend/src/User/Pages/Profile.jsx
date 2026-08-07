@@ -35,7 +35,7 @@ function Profile() {
       <div className="h-50 bg-black">
       </div>
       <img src={
-        userData.profileImage? `${axiosInstance.defaults.baseURL}/uploads/${userData.profileImage}` 
+        userData.profileImage? userData.profileImage.startsWith('https://lh3.googleusercontent.com/a') ? userData.profileImage : `${axiosInstance.defaults.baseURL}/uploads/${userData.profileImage}` 
         : "https://res.cloudinary.com/dwaaoyztz/image/upload/v1782669460/samples/animals/cat.jpg"
       } className='-my-25 h-50 w-50 object-cover ms-32 border-10 border-white rounded-full' alt="" />
       <div className="w-full flex justify-center items-center mt-30">

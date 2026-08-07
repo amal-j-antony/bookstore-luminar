@@ -3,7 +3,7 @@ import { serverURL } from './serverURL'
 
 const axiosInstance = axios.create({
     baseURL: serverURL,
-    timeout: 5000
+    timeout: 10000
 })
 
 axiosInstance.interceptors.request.use(
@@ -38,7 +38,7 @@ axiosInstance.interceptors.response.use(
                 console.log('API not found');
             }
             else if (status == 500) {
-                console.log('Server Error');
+                console.log('Server Error',error);
             }
 
         }
