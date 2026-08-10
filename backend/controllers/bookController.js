@@ -211,7 +211,7 @@ exports.bookPaymentController = async (req,res) => {
         // stripe
         const session = await stripe.checkout.sessions.create({
             success_url: `${process.env.FRONTEND_URL}/payment/success`,
-            cancel_url: "http://localhost:5173/payment/error",
+            cancel_url: `${process.env.FRONTEND_URL}/payment/error`,
             line_items,
             mode: "payment",
             payment_method_types: ["card"]
