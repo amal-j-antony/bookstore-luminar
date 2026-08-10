@@ -110,8 +110,10 @@ function Auth({ insideRegister }) {
       sessionStorage.setItem("token", result.data.token)
       form.resetForm()
       if (result.data.user.role == "admin") {
+        setRole('admin')
         navigate("/admindashboard")
       } else {
+        setRole('user')
         navigate("/")
       }
     } else if (result.status === 409) {
