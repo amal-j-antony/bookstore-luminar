@@ -1,6 +1,6 @@
 const express = require('express')
 const { registerController, loginController, updateUserController, getAllUsersController, updateAdminController, googleAuthCOntroller } = require('../controllers/userController')
-const { addBookController,approveBookController, getHomeBooks, getAllBooksController, viewBookController, getUserUploadedBooks, getPurchaseHistory, deleteBookController, getAllBooksAdminController, generateBookAbstractController } = require('../controllers/bookController')
+const { addBookController,approveBookController, getHomeBooks, getAllBooksController, viewBookController, getUserUploadedBooks, getPurchaseHistory, deleteBookController, getAllBooksAdminController, generateBookAbstractController, bookPaymentController } = require('../controllers/bookController')
 const jwtAuthMiddleware = require('../middlewares/jwtAuthmiddleware')
 const jwtAdminMiddleware = require('../middlewares/jwtAdminMiddleware')
 const multerMiddleware = require('../middlewares/multerMiddleware')
@@ -42,5 +42,7 @@ router.put("/updateAdmin/:id",jwtAdminMiddleware,multerMiddleware.single("profil
 router.post("/googleAuth",googleAuthCOntroller)
 //genai
 router.post("/abstract/generate",jwtAuthMiddleware,generateBookAbstractController)
+//stripe
+router.put("/make/payment/:id",jwtAuthMiddleware,bookPaymentController)
 
 module.exports = router

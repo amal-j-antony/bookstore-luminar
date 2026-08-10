@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../Components/Header'
 import { FaEye, FaBackward } from "react-icons/fa";
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { viewBookAPI } from '../../services/allAPI.JS';
 import axiosInstance from '../../services/axiosInstance';
-
+import { loadStripe } from '@stripe/stripe-js';
+import { makePaymentAPI } from '../../services/allAPI.JS';
 
 function ViewBook() {
   const { id } = useParams()
   console.log(id);
   const [viewBook, setViewBook] = useState({})
+  const navigate = useNavigate()
 
   const getBookDetails = async () => {
     try {
@@ -20,6 +22,24 @@ function ViewBook() {
         setViewBook(result.data)
       }
 
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
+
+  const handlePayment = async () => {
+    try {
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_KEY)
+      console.log(stripe);
+      
+      const result = await makePaymentAPI(id)
+      console.log(result);
+      const checkoutURL= result.data.checkoutURL
+
+      window.location.href = checkoutURL
+      
+      
     } catch (error) {
       console.log(error);
 
@@ -58,7 +78,7 @@ function ViewBook() {
           </div>
           <div className="flex justify-end p-5 gap-5 ">
             <Link to={"/books"} className="flex gap-2 bg-blue-900 font-bold p-2 text-white " ><FaBackward /> Back</Link>
-            <button className='bg-green-900 p-2 font-bold text-white'>Buy Rs{viewBook.discountPrice}</button>
+            <button onClick={handlePayment} className='bg-green-900 p-2 font-bold text-white'>Buy Rs{viewBook.discountPrice}</button>
           </div>
         </div>
       </div>
@@ -74,18 +94,18 @@ function ViewBook() {
 
             {
               viewBook?.uploadImages?.length == 0 ?
-              <p className='text-red-500'>User uploaded book images unavailable</p>
-              :
-              <>
-                {
-                  viewBook?.uploadImages?.map((item, index) => (
-                    <img key={'asssfff'+index} src={`${axiosInstance.defaults.baseURL}/uploads/${item}`} alt="" />
-                  ))
-                }
-              </>
+                <p className='text-red-500'>User uploaded book images unavailable</p>
+                :
+                <>
+                  {
+                    viewBook?.uploadImages?.map((item, index) => (
+                      <img key={'asssfff' + index} src={`${axiosInstance.defaults.baseURL}/uploads/${item}`} alt="" />
+                    ))
+                  }
+                </>
             }
             <div className="flex flex-wrap justify-center py-5 h-30">
-              
+
             </div>
           </div>
         </div>

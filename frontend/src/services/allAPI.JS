@@ -80,3 +80,8 @@ export const googleAuthAPI = async (reqBody) => {
 export const generateAbstractAPI = async (bookTitle) => {
     return await commonAPI('POST','/abstract/generate',{bookTitle})
 }
+
+//payment
+export const makePaymentAPI = async (id)=>{
+    return await commonAPI(`PUT`,`/make/payment/${id}`)
+}

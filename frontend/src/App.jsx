@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -18,6 +18,11 @@ import Preloader from './common/Preloader'
 import FakeHeader from './common/FakeHeader'
 import 'animate.css';
 import { ToastContainer } from 'react-toastify'
+import PaymentSuccess from './User/Pages/PaymentSuccess'
+import PaymentError from './User/Pages/PaymentError'
+import { CheckoutForm } from '@stripe/react-stripe-js/checkout'
+import Checckout from './User/Components/Checckout'
+import { routeContext } from './contextShare/RouteGuardContext'
 
 function App() {
   // const [isLoading, setIsLoading] = useState(true)
@@ -27,17 +32,13 @@ function App() {
   //     }, 2000)
   //   }, [])
 
-
-
-
-
-
+  const { role } = useContext(routeContext)
   return (
     <>
 
 
       <Routes>
-
+        <Route path='/checkout' element={<Checckout />} />
         {/* common */}
         <Route path='/' element={<Home />} />
         <Route path='/contact' element={<Contact />} />
@@ -46,22 +47,31 @@ function App() {
 
 
         {/* users */}
-        <Route path='/books' element={<Books />} />
-        <Route path='/profile/:id' element={<Profile />} />
-        <Route path='/view/:id/book' element={<ViewBook />} />
+        {role == "user" &&
+          <>
+            <Route path='/books' element={<Books />} />
+            <Route path='/profile/:id' element={<Profile />} />
+            <Route path='/view/:id/book' element={<ViewBook />} />
+            <Route path='/payment/success' element={<PaymentSuccess />} />
+            <Route path='/payment/error' element={<PaymentError />} />
+          </>}
 
         {/* admin */}
-        <Route path='/admindashboard' element={<AdminDashboard />} />
-        <Route path='/adminresources' element={<AdminResources />} />
-        <Route path='/adminsettings' element={<AdminSettings />} />
+
+        {role == "admin" &&
+          <>
+            <Route path='/admindashboard' element={<AdminDashboard />} />
+            <Route path='/adminresources' element={<AdminResources />} />
+            <Route path='/adminsettings' element={<AdminSettings />} />
+          </>}
 
         {/* pnf */}
         <Route path='/*' element={<Pnf />} />
       </Routes>
       <ToastContainer
         position="top-center"
-        autoClose={5000}        
-        theme="colored"        
+        autoClose={5000}
+        theme="colored"
       />
     </>
   )

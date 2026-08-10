@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FaUser } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
@@ -9,11 +9,13 @@ import { toast } from 'react-toastify'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from "jwt-decode";
 import { googleAuthAPI } from '../services/allAPI.JS'
+import { routeContext } from '../contextShare/RouteGuardContext'
 
 
 function Auth({ insideRegister }) {
   // console.log(insideRegister);
   const navigate = useNavigate()
+  const {role,setRole,authorizedUser,setAuthorizedUser} = useContext(routeContext)
 
   const form = useFormik({
     // initial values
@@ -52,6 +54,7 @@ function Auth({ insideRegister }) {
       if (result.status == 201) {
         toast.success("Register Successful")
         form.resetForm()
+
         navigate("/login")
       } else {
         toast.error('Something went wrong')
@@ -74,8 +77,10 @@ function Auth({ insideRegister }) {
         sessionStorage.setItem("token", result.data.token)
         form.resetForm()
         if (result.data.user.role == "admin") {
+          setRole("admin")
           navigate("/admindashboard")
         } else {
+          setRole("user")
           navigate("/")
         }
       } else if (result.status === 409) {

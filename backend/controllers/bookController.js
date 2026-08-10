@@ -1,5 +1,6 @@
 const books = require('../models/bookModel')
-const {GoogleGenerativeAI} = require('@google/generative-ai')
+const { GoogleGenerativeAI } = require('@google/generative-ai')
+const stripe = require('stripe')(process.env.STRIPE_SK_KEY)
 
 exports.addBookController = async (req, res) => {
     console.log('Inside book controller');
@@ -40,10 +41,10 @@ exports.addBookController = async (req, res) => {
 }
 
 exports.approveBookController = async (req, res) => {
-    const {bookID} = req.params
+    const { bookID } = req.params
     console.log('Approve book initialized');
     try {
-        const result = await books.updateOne({_id: bookID},{$set:{status: "Approved"}})
+        const result = await books.updateOne({ _id: bookID }, { $set: { status: "Approved" } })
         // books.findByIdAndUpdate({_id: bookID},{status: "approved"},{new:true})
         // findByIdAndUpdate can also be used here
         res.status(200).json({
@@ -56,7 +57,7 @@ exports.approveBookController = async (req, res) => {
             details: error.message
         })
     }
-    
+
 
 }
 
@@ -77,10 +78,10 @@ exports.getAllBooksController = async (req, res) => {
     const sellerEmail = req.email
     const searchKey = req.query.search
     console.log(searchKey);
-    
+
 
     try {
-        const result = await books.find({ sellerEmail: { $ne: sellerEmail }, bookTitle: {$regex: searchKey,$options: "i"} })
+        const result = await books.find({ sellerEmail: { $ne: sellerEmail }, bookTitle: { $regex: searchKey, $options: "i" } })
         res.status(200).json(result)
     } catch (error) {
         res.status(500).json({
@@ -156,11 +157,11 @@ exports.getAllBooksAdminController = async (req, res) => {
 
 //genAi
 
-exports.generateBookAbstractController = async (req,res) => {
+exports.generateBookAbstractController = async (req, res) => {
     try {
-        const {bookTitle} = req.body
+        const { bookTitle } = req.body
         console.log(bookTitle);
-        
+
         console.log('Inside genAI');
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API)
 
@@ -171,7 +172,7 @@ exports.generateBookAbstractController = async (req,res) => {
         const result = await model.generateContent(`Give me a short abstract of the book ${bookTitle}  without formatting, to be displayed on a bookstore website `)
         console.log(result.response);
 
-        
+
         res.status(200).json({
             status: "generated",
             bookTitle,
@@ -179,6 +180,46 @@ exports.generateBookAbstractController = async (req,res) => {
             fullResponse: result.response
         })
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message })
+    }
+}
+
+exports.bookPaymentController = async (req,res) => {
+    try {
+        const { id } = req.params
+        const buyerEmail = req.email
+        const bookDetails = await books.findById({ _id: id })
+        bookDetails.status = "sold"
+        bookDetails.boughtBy = buyerEmail
+
+        const line_items = [{
+            price_data: {
+                currency: "usd",
+                product_data: {
+                    name: bookDetails.bookTitle,
+                    description: `${bookDetails.author}, ${bookDetails.publisher}`,
+                    // images: bookDetails.uploadImages,
+                    metadata: {
+                        title: bookDetails.bookTitle, author: bookDetails.author, price: bookDetails.discountPrice
+                    }
+                },
+                unit_amount: Math.round(bookDetails.discountPrice * 100)
+            },
+            quantity: 1
+        }]
+
+        // stripe
+        const session = await stripe.checkout.sessions.create({
+            success_url: "http://localhost:5173/payment/success",
+            cancel_url: "http://localhost:5173/payment/error",
+            line_items,
+            mode: "payment",
+            payment_method_types: ["card"]
+        })
+        console.log(session);
+        session.url && await bookDetails.save()
+        res.status(200).json({ checkoutURL: session.url })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
 }
